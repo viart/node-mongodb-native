@@ -13,7 +13,10 @@ describe 'BSON'
       for(var i = 0; i < bytes.length; i++) {
         serialized_data = serialized_data + mongo.BinaryParser.fromByte(bytes[i]);
       }
-      var object = mongo.BSON.deserialize(serialized_data);
+      var buffer = new Buffer(serialized_data.length);
+      buffer.write(serialized_data, 'binary', 0);
+      
+      var object = mongo.BSON.deserialize(buffer);
       object.name.should.eql "a_1"
       object.unique.should.eql false
       object.key.a.should.eql 1
@@ -26,7 +29,9 @@ describe 'BSON'
       for(var i = 0; i < bytes.length; i++) {
         serialized_data = serialized_data + mongo.BinaryParser.fromByte(bytes[i])
       }
-      var object = mongo.BSON.deserialize(serialized_data)
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+      var object = mongo.BSON.deserialize(buffer)
       object.string.should.eql "hello"
       object.array.should.eql [1,2,3]
       object.hash.a.should.eql 1
@@ -46,58 +51,86 @@ describe 'BSON'
     it 'Should Serialize and Deserialze String'
       var test_string = {hello: 'world'}
       var serialized_data = mongo.BSON.serialize(test_string)
-      test_string.should.eql mongo.BSON.deserialize(serialized_data)
+
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+    
+      test_string.should.eql mongo.BSON.deserialize(buffer)
     end
     
     it 'Should Correctly Serialize and Deserialize Integer'
       var test_number = {doc: 5}
       var serialized_data = mongo.BSON.serialize(test_number)
-      test_number.doc.should.eql mongo.BSON.deserialize(serialized_data).doc
+
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+
+      test_number.doc.should.eql mongo.BSON.deserialize(buffer).doc
     end    
     
     it 'Should Correctly Serialize and Deserialize null value'
       var test_null = {doc:null}
       var serialized_data = mongo.BSON.serialize(test_null)
-      var object = mongo.BSON.deserialize(serialized_data)
+
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+
+      var object = mongo.BSON.deserialize(buffer)
       object.doc.should.be_null
     end
     
     it 'Should Correctly Serialize and Deserialize Number'
       var test_number = {doc: 5.5}
       var serialized_data = mongo.BSON.serialize(test_number)
-      test_number.should.eql mongo.BSON.deserialize(serialized_data)
+
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+
+      test_number.should.eql mongo.BSON.deserialize(buffer)
     end
     
     it 'Should Correctly Serialize and Deserialize Integer'
       var test_int = {doc: 42}
       var serialized_data = mongo.BSON.serialize(test_int)
-      test_int.doc.should.eql mongo.BSON.deserialize(serialized_data).doc
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+      test_int.doc.should.eql mongo.BSON.deserialize(buffer).doc
     
       test_int = {doc: -5600}
       serialized_data = mongo.BSON.serialize(test_int)
-      test_int.doc.should.eql mongo.BSON.deserialize(serialized_data).doc
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+      test_int.doc.should.eql mongo.BSON.deserialize(buffer).doc
     
       test_int = {doc: 2147483647}
       serialized_data = mongo.BSON.serialize(test_int)
-      test_int.doc.should.eql mongo.BSON.deserialize(serialized_data).doc
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+      test_int.doc.should.eql mongo.BSON.deserialize(buffer).doc
           
       test_int = {doc: -2147483648}
       serialized_data = mongo.BSON.serialize(test_int)
-      test_int.doc.should.eql mongo.BSON.deserialize(serialized_data).doc
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+      test_int.doc.should.eql mongo.BSON.deserialize(buffer).doc
     end
     
     it 'Should Correctly Serialize and Deserialize Object'
       var doc = {doc: {age: 42, name: 'Spongebob', shoe_size: 9.5}}
       var serialized_data = mongo.BSON.serialize(doc)
-      doc.doc.age.should.eql mongo.BSON.deserialize(serialized_data).doc.age
-      doc.doc.name.should.eql mongo.BSON.deserialize(serialized_data).doc.name
-      doc.doc.shoe_size.should.eql mongo.BSON.deserialize(serialized_data).doc.shoe_size
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+      doc.doc.age.should.eql mongo.BSON.deserialize(buffer).doc.age
+      doc.doc.name.should.eql mongo.BSON.deserialize(buffer).doc.name
+      doc.doc.shoe_size.should.eql mongo.BSON.deserialize(buffer).doc.shoe_size
     end
     
     it 'Should Correctly Serialize and Deserialize Array'
       var doc = {doc: [1, 2, 'a', 'b']}
       var serialized_data = mongo.BSON.serialize(doc)
-      var deserialized = mongo.BSON.deserialize(serialized_data);
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+      var deserialized = mongo.BSON.deserialize(buffer);
       doc.doc.should.eql deserialized.doc
     end   
     
@@ -105,14 +138,18 @@ describe 'BSON'
       Array.prototype.toXml = function() {}    
       var doc = {doc: [1, 2, 'a', 'b']}
       var serialized_data = mongo.BSON.serialize(doc)
-      var deserialized = mongo.BSON.deserialize(serialized_data);
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+      var deserialized = mongo.BSON.deserialize(buffer);
       doc.doc.should.eql deserialized.doc
     end   
     
     it 'Should Correctly Serialize and Deserialize A Boolean'
       var doc = {doc: true}
       var serialized_data = mongo.BSON.serialize(doc)
-      doc.should.eql mongo.BSON.deserialize(serialized_data)
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+      doc.should.eql mongo.BSON.deserialize(buffer)
     end
     
     it 'Should Correctly Serialize and Deserialize a Date'
@@ -126,25 +163,33 @@ describe 'BSON'
       date.setUTCSeconds(30)
       var doc = {doc: date}
       var serialized_data = mongo.BSON.serialize(doc)
-      doc.date.should.eql mongo.BSON.deserialize(serialized_data).date      
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+      doc.date.should.eql mongo.BSON.deserialize(buffer).date      
     end    
         
     it 'Should Correctly Serialize and Deserialize Oid'
       var doc = {doc: new mongo.ObjectID()}
       var serialized_data = mongo.BSON.serialize(doc)
-      doc.should.eql mongo.BSON.deserialize(serialized_data)
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+      doc.should.eql mongo.BSON.deserialize(buffer)
     end    
         
     it 'Should Correctly encode Empty Hash'
       var test_code = {}
       var serialized_data = mongo.BSON.serialize(test_code)
-      test_code.should.eql mongo.BSON.deserialize(serialized_data)
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+      test_code.should.eql mongo.BSON.deserialize(buffer)
     end        
     
     it 'Should Correctly Serialize and Deserialize Ordered Hash'
       var doc = {doc: new mongo.OrderedHash().add('b', 1).add('a', 2).add('c', 3).add('d', 4)};
       var serialized_data = mongo.BSON.serialize(doc)
-      var decoded_hash = mongo.BSON.deserialize(serialized_data).doc
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+      var decoded_hash = mongo.BSON.deserialize(buffer).doc
       var keys = []
       for(name in decoded_hash) keys.push(name)
       keys.should.eql ['b', 'a', 'c', 'd']      
@@ -154,7 +199,9 @@ describe 'BSON'
       // Serialize the regular expression
       var doc = {doc: /foobar/mi}
       var serialized_data = mongo.BSON.serialize(doc)
-      var doc2 = mongo.BSON.deserialize(serialized_data)
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+      var doc2 = mongo.BSON.deserialize(buffer)
       doc.should.eql doc2         
       doc.doc.toString().should.eql doc2.doc.toString()
     end
@@ -167,7 +214,9 @@ describe 'BSON'
       }
       var doc = {doc: bin}
       var serialized_data = mongo.BSON.serialize(doc)
-      var deserialized_data = mongo.BSON.deserialize(serialized_data)
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+      var deserialized_data = mongo.BSON.deserialize(buffer)
       doc.doc.value().should.eql deserialized_data.doc.value()
     end
     
@@ -177,7 +226,9 @@ describe 'BSON'
       bin.write(data)
       var doc = {doc: bin}
       var serialized_data = mongo.BSON.serialize(doc)
-      var deserialized_data = mongo.BSON.deserialize(serialized_data)
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+      var deserialized_data = mongo.BSON.deserialize(buffer)
       doc.doc.value().should.eql deserialized_data.doc.value()
     end
     
@@ -186,7 +237,9 @@ describe 'BSON'
       var doc = {}
       doc['dbref'] = new mongo.DBRef('namespace', oid, null)      
       var serialized_data = mongo.BSON.serialize(doc)
-      var doc2 = mongo.BSON.deserialize(serialized_data)
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+      var doc2 = mongo.BSON.deserialize(buffer)
       doc2.dbref.should.be_an_instance_of mongo.DBRef
       doc2.dbref.namespace.should.eql 'namespace'
       doc2.dbref.oid.should.eql oid
@@ -195,24 +248,32 @@ describe 'BSON'
     it 'Should Correctly Serialize and Deserialize Long Integer'
       var test_int = {doc: mongo.Long.fromNumber(9223372036854775807)}
       var serialized_data = mongo.BSON.serialize(test_int)
-      var deserialized_data = mongo.BSON.deserialize(serialized_data)      
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+      var deserialized_data = mongo.BSON.deserialize(buffer)      
       test_int.doc.equals(deserialized_data.doc).should.eql true
       
       test_int = {doc: mongo.Long.fromNumber(-9223372036854775)}
       serialized_data = mongo.BSON.serialize(test_int)
-      deserialized_data = mongo.BSON.deserialize(serialized_data)
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+      deserialized_data = mongo.BSON.deserialize(buffer)
       test_int.doc.equals(deserialized_data.doc).should.eql true
       
       test_int = {doc: mongo.Long.fromNumber(-9223372036854775809)}
       serialized_data = mongo.BSON.serialize(test_int)
-      deserialized_data = mongo.BSON.deserialize(serialized_data)
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+      deserialized_data = mongo.BSON.deserialize(buffer)
       test_int.doc.equals(deserialized_data.doc).should.eql true
     end
     
     it 'Should Always put the id as the first item in a hash'
       var hash = {doc: new mongo.OrderedHash().add('not_id', 1).add('_id', 2)}
       var serialized_data = mongo.BSON.serialize(hash)
-      var deserialized_data = mongo.BSON.deserialize(serialized_data)
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+      var deserialized_data = mongo.BSON.deserialize(buffer)
       var keys = [];
     
       for(name in deserialized_data.doc) {
@@ -231,7 +292,9 @@ describe 'BSON'
       }
       var doc = {doc: bin}
       var serialized_data = mongo.BSON.serialize(doc)
-      var deserialized_data = mongo.BSON.deserialize(serialized_data)
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+      var deserialized_data = mongo.BSON.deserialize(buffer)
       deserialized_data.doc.sub_type.should.eql mongo.BSON.BSON_BINARY_SUBTYPE_USER_DEFINED
       doc.doc.value().should.eql deserialized_data.doc.value()
     end
@@ -239,7 +302,9 @@ describe 'BSON'
     it 'Should Correclty Serialize and Deserialize a Code object' 
       var doc = {'doc': new mongo.Code('this.a > i', new mongo.OrderedHash().add('i', 1))};
       var serialized_data = mongo.BSON.serialize(doc)
-      var deserialized_data = mongo.BSON.deserialize(serialized_data)
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+      var deserialized_data = mongo.BSON.deserialize(buffer)
       deserialized_data.doc.code.should.eql(doc.doc.code);
       deserialized_data.doc.scope.i.should.eql(doc.doc.scope.get('i'));
     end
@@ -250,7 +315,9 @@ describe 'BSON'
       };
     
       var serialized_data = mongo.BSON.serialize(doc)
-      var deserialized_data = mongo.BSON.deserialize(serialized_data)
+      var buffer = new Buffer(serialized_data.length)
+      buffer.write(serialized_data, 'binary', 0)
+      var deserialized_data = mongo.BSON.deserialize(buffer)
       deserialized_data.a.should.eql doc.a
       deserialized_data.b.should.eql doc.b      
     end
