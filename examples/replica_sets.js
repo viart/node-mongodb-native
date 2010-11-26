@@ -19,35 +19,25 @@ var cluster = new ServerCluster([
 //after execution do inspect values in collection 'test'
 
 var db = new Db('node-mongo-examples', cluster, {replicaSets: true});
-db.open(function(err, db) {
 
-    if (err) {
-        sys.puts(sys.inspect(err));
+// smart collection functionality used
+db.initCollections('baz');
+db.baz.remove();
+
+var i = 0;
+var interval = setInterval(function(){
+
+    if (++i > 2000) {
+        clearInterval(interval);
         return;
     }
 
-    // flush
-    db.dropDatabase(function() {
-        db.collection('test', function(err, collection) {
-            if (err) {
-                sys.puts(sys.inspect(err));
-                return;
-            }
+    db.baz.insert({cnt: i}, {safe: true}, function(err, doc){
+        if (err) {
+            sys.puts(sys.inspect(err));
+            return;
+        }
+        sys.puts(doc[0].cnt);
+    })
 
-            var i = 0;
-            var insert = function(){
-                collection.insert({cnt: i++}, function(err, doc){
-                    if (err) {
-                        sys.puts(sys.inspect(err));
-                        return;
-                    }
-                    sys.puts(doc[0].cnt);
-                })
-                if (i < 2000) {
-                    setTimeout(insert, 10);
-                }
-            };
-            insert();
-        });
-    });
-});
+}, 10);
