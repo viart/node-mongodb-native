@@ -5,20 +5,20 @@ test = require("assert");
 
 var Db = require('../lib/mongodb').Db,
     Server = require('../lib/mongodb').Server,
-    ServerCluster = require('../lib/mongodb').ServerCluster;
+    ReplicaSets = require('../lib/mongodb').ReplicaSets;
 
 var host = process.env['MONGO_NODE_DRIVER_HOST'] != null ? process.env['MONGO_NODE_DRIVER_HOST'] : 'localhost';
-var cluster = new ServerCluster([
+var servers = [
     new Server(host, 27017),
     new Server(host, 27018),
     new Server(host, 27019),
-]);
+];
 
 //when executed you need to kill master server (in background)
 //...
-//after execution do inspect values in collection 'test'
+//after execution do inspect values in collection 'baz'
 
-var db = new Db('node-mongo-examples', cluster, {replicaSets: true});
+var db = new Db('node-mongo-examples', new ReplicaSets(servers), {replicaSets: true});
 
 // smart collection functionality used
 db.initCollections('baz');
